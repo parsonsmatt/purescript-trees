@@ -23,6 +23,6 @@
     "package.json"
   ],
   "dependencies": {
-    "purescript-nonempty": "^0.1.0",
+    "purescript-nonempty": "^0.1.0"
   }
 }
