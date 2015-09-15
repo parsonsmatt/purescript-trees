@@ -1,0 +1,28 @@
+{
+  "name": "purescript-trees",
+  "homepage": "https://github.com/jplatte/purescript-trees",
+  "authors": [
+    "Jonas Platte <mail@jonasplatte.de>"
+  ],
+  "description": "Rose trees",
+  "keywords": [
+    "purescript"
+  ],
+  "license": "AGPL-3.0",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/jplatte/purescript-trees.git"
+  },
+  "ignore": [
+    "**/.*",
+    "bower_components",
+    "node_modules",
+    "output",
+    "test",
+    "bower.json",
+    "package.json"
+  ],
+  "dependencies": {
+    "purescript-nonempty": "^0.1.0",
+  }
+}
