@@ -23,6 +23,8 @@
     "package.json"
   ],
   "dependencies": {
+    "purescript-arrays": "^0.4.2",
+    "purescript-foldable-traversable": "^0.4.0",
     "purescript-nonempty": "^0.1.0"
   }
 }
