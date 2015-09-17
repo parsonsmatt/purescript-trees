@@ -2,7 +2,8 @@
   "name": "purescript-trees",
   "homepage": "https://github.com/jplatte/purescript-trees",
   "authors": [
-    "Jonas Platte <mail@jonasplatte.de>"
+    "Jonas Platte <mail@jonasplatte.de>",
+    "Matthieu Bulté <@matthieubulte>"
   ],
   "description": "Rose trees",
   "keywords": [
