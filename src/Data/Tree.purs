@@ -30,6 +30,8 @@ instance bindTree :: Bind Tree where
   bind (Tree x ts) f = case f x of
     Tree x' ts' -> Tree x' (ts' <> map (`bind` f) ts)
 
+instance monadTree :: Monad Tree
+
 instance foldableTree :: Foldable Tree where
   foldr f b (Tree a []) = f a b
   foldr f b (Tree a ts) = f a (foldr (flip $ foldr f) b ts)
