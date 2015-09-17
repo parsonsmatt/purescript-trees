@@ -8,7 +8,7 @@
   "keywords": [
     "purescript"
   ],
-  "license": "AGPL-3.0",
+  "license": "LGPL-3.0+",
   "repository": {
     "type": "git",
     "url": "git://github.com/jplatte/purescript-trees.git"
