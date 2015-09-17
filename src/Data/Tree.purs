@@ -34,9 +34,7 @@ instance bindTree :: Bind Tree where
 instance monadTree :: Monad Tree
 
 instance foldableTree :: Foldable Tree where
-  foldr f b (Tree a []) = f a b
   foldr f b (Tree a ts) = f a (foldr (flip $ foldr f) b ts)
-  foldl f b (Tree a []) = f b a
   foldl f b (Tree a ts) = f (foldl (foldl f) b ts) a
   foldMap f (Tree a ts) = f a <> foldMap (foldMap f) ts
 
