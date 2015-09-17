@@ -7,6 +7,7 @@ import Prelude
 import Data.Array ((:), concatMap)
 import Data.Foldable
 import Data.NonEmpty (NonEmpty(), (:|))
+import Control.Alt (Alt, alt)
 
 data Tree a = Tree a (Array (Tree a))
 
@@ -24,6 +25,10 @@ instance applyTree :: Apply Tree where
 
 instance applicativeTree :: Applicative Tree where
   pure a = Tree a []
+
+instance bindTree :: Bind Tree where
+  bind (Tree x ts) f = case f x of
+    Tree x' ts' -> Tree x' (ts' <> map (`bind` f) ts)
 
 instance foldableTree :: Foldable Tree where
   foldr f b (Tree a []) = f a b
