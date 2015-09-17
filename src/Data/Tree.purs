@@ -19,6 +19,12 @@ instance eqTree :: (Eq a) => Eq (Tree a) where
 instance functorTree :: Functor Tree where
   map f (Tree a ts) = Tree (f a) (map f <$> ts)
 
+instance applyTree :: Apply Tree where
+  apply (Tree f fTs) aT@(Tree a aTs) = Tree (f a) (map (f <$>) aTs <> map (<*> aT) fTs)
+
+instance applicativeTree :: Applicative Tree where
+  pure a = Tree a []
+
 instance foldableTree :: Foldable Tree where
   foldr f b (Tree a []) = f a b
   foldr f b (Tree a ts) = f a (foldr (flip $ foldr f) b ts)
