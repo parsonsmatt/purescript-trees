@@ -6,6 +6,7 @@ module Data.Tree
 import Prelude
 import Data.Array ((:), concatMap)
 import Data.Foldable
+import Data.Traversable (Traversable, traverse, sequence)
 import Data.NonEmpty (NonEmpty(), (:|))
 import Control.Alt (Alt, alt)
 
@@ -38,6 +39,11 @@ instance foldableTree :: Foldable Tree where
   foldl f b (Tree a []) = f b a
   foldl f b (Tree a ts) = f (foldl (foldl f) b ts) a
   foldMap f (Tree a ts) = f a <> foldMap (foldMap f) ts
+
+instance traversableTree :: Traversable Tree where
+--  traverse :: forall a b m. (Applicative m) => (a -> m b) -> t a -> m (t b)
+  traverse f (Tree x ts) = Tree <$> f x <*> traverse (traverse f) ts
+  sequence = traverse id
 
 flatten :: forall a. Tree a -> NonEmpty Array a
 flatten (Tree a ts) = a :| concatMap flatten' ts
