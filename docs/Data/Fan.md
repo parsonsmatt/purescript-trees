@@ -46,7 +46,7 @@ outLazy :: forall a. Fan a -> View (Compose Lazy Fan) a
 #### `transView`
 
 ``` purescript
-transView :: forall f g a. (forall a. f a -> g a) -> View f a -> View g a
+transView :: forall f g a. (forall b. f b -> g b) -> View f a -> View g a
 ```
 
 

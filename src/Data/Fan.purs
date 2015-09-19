@@ -33,6 +33,6 @@ intoLazy (View a ts) = Fan a (defer \_ -> decompose <$> ts)
 outLazy :: forall a. Fan a -> View (Compose Lazy Fan) a
 outLazy (Fan a ts) = View a (Compose <$> force ts)
 
-transView :: forall f g a. (forall a. f a -> g a) -> View f a -> View g a
+transView :: forall f g a. (forall b. f b -> g b) -> View f a -> View g a
 transView η (View a ts) = View a (η <$> ts)
 
