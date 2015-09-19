@@ -63,7 +63,7 @@ tree = into $ View 0 []
 transView :: forall f g a. (forall a. f a -> g a) -> View f a -> View g a
 ```
 
-Map a tree across a natural transformation. Example:
+Map a tree across a natural transformation.
 
 #### `flatten`
 
