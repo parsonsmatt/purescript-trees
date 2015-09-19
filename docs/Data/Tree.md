@@ -60,7 +60,7 @@ tree = into $ View 0 []
 #### `transView`
 
 ``` purescript
-transView :: forall f g a. (forall a. f a -> g a) -> View f a -> View g a
+transView :: forall f g a. (forall b. f b -> g b) -> View f a -> View g a
 ```
 
 Map a tree across a natural transformation.

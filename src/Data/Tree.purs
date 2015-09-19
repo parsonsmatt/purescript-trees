@@ -39,7 +39,7 @@ into :: forall a. View Tree a -> Tree a
 into (View a ts) = Tree a ts
 
 -- | Map a tree across a natural transformation.
-transView :: forall f g a. (forall a. f a -> g a) -> View f a -> View g a
+transView :: forall f g a. (forall b. f b -> g b) -> View f a -> View g a
 transView η (View a ts) = View a (η <$> ts)
 
 instance showTree :: (Show a) => Show (Tree a) where
