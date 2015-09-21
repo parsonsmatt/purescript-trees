@@ -1,5 +1,9 @@
 module Data.Tree
-  ( Tree(..)
+  ( Tree()
+  , View(..)
+  , out
+  , into
+  , transView
   , flatten
   ) where
 
@@ -9,7 +13,34 @@ import Data.Foldable (Foldable, foldr, foldl, foldMap)
 import Data.Traversable (Traversable, traverse, sequence)
 import Data.NonEmpty (NonEmpty(), (:|))
 
+-- | An abstract tree type
 data Tree a = Tree a (Array (Tree a))
+
+-- | A view which is used to construct and destruct the tree. This type is a
+-- | pattern functor/signature, where `f` represents the recursive structure.
+data View f a = View a (Array (f a))
+
+-- | Pattern match on a tree. Example:
+-- |
+-- | ````purescript
+-- | case out t of
+-- |   View a ts -> ...
+-- | ````
+out :: forall a. Tree a -> View Tree a
+out (Tree a ts) = View a ts
+
+-- | Construct a tree from a tree pattern/view. Example:
+-- |
+-- | ````purescript
+-- | tree :: Tree Int
+-- | tree = into $ View 0 []
+-- | ````
+into :: forall a. View Tree a -> Tree a
+into (View a ts) = Tree a ts
+
+-- | Map a tree across a natural transformation.
+transView :: forall f g a. (forall b. f b -> g b) -> View f a -> View g a
+transView η (View a ts) = View a (η <$> ts)
 
 instance showTree :: (Show a) => Show (Tree a) where
   show (Tree a ts) = "Tree " <> show a <> " " <> show ts
