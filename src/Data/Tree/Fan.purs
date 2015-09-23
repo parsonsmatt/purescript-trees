@@ -1,4 +1,4 @@
-module Data.Fan
+module Data.Tree.Fan
   ( Fan()
   , View(..)
   , into
@@ -35,4 +35,3 @@ outLazy (Fan a ts) = View a (Compose <$> force ts)
 
 transView :: forall f g a. (forall b. f b -> g b) -> View f a -> View g a
 transView η (View a ts) = View a (η <$> ts)
-

@@ -1,4 +1,4 @@
-## Module Data.Fan
+## Module Data.Tree.Fan
 
 #### `Fan`
 
@@ -48,5 +48,3 @@ outLazy :: forall a. Fan a -> View (Compose Lazy Fan) a
 ``` purescript
 transView :: forall f g a. (forall b. f b -> g b) -> View f a -> View g a
 ```
-
-
