@@ -1,17 +1,24 @@
 module Data.Tree
   ( Tree()
   , View(..)
+  , flatten
   , out
   , into
   , transView
-  , flatten
   ) where
 
 import Prelude
-import Data.Array ((:), concatMap)
+
+import Math as Math
+import Data.Int as Int
+import Control.Extend (Extend, extend)
+import Control.Comonad (Comonad, extract)
+import Data.Array ((:), concatMap, replicateM)
 import Data.Foldable (Foldable, foldr, foldl, foldMap)
 import Data.Traversable (Traversable, traverse, sequence)
 import Data.NonEmpty (NonEmpty(), (:|))
+import Test.QuickCheck.Arbitrary
+import Test.QuickCheck.Gen
 
 -- | An abstract tree type
 data Tree a = Tree a (Array (Tree a))
@@ -71,6 +78,22 @@ instance foldableTree :: Foldable Tree where
 instance traversableTree :: Traversable Tree where
   traverse f (Tree a ts) = Tree <$> f a <*> traverse (traverse f) ts
   sequence = traverse id
+
+instance extendTree :: Extend Tree where
+  extend f t@(Tree a ts) = Tree (f t) (map (extend f) ts)
+
+instance comonadTree :: Comonad Tree where
+  extract (Tree a _) = a
+
+instance arbitraryTree :: Arbitrary a => Arbitrary (Tree a) where
+  arbitrary = sized go
+    where go 0 = Tree <$> arbitrary <*> return []
+          go n = do
+            sz <- Int.floor <<< Math.abs <$> arbitrary
+            Tree <$> arbitrary <*> replicateM sz (go (n / (sz + 1)))
+
+instance coarbitraryTree :: Coarbitrary a => Coarbitrary (Tree a) where
+  coarbitrary (Tree a ts) = coarbitrary a <<< coarbitrary ts
 
 flatten :: forall a. Tree a -> NonEmpty Array a
 flatten (Tree a ts) = a :| concatMap flatten' ts
