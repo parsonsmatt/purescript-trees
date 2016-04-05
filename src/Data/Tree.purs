@@ -1,10 +1,10 @@
 module Data.Tree
   ( Tree()
   , View(..)
-  , flatten
   , out
   , into
   , transView
+  , flatten
   ) where
 
 import Prelude
@@ -17,8 +17,9 @@ import Data.Array ((:), concatMap, replicateM)
 import Data.Foldable (Foldable, foldr, foldl, foldMap)
 import Data.Traversable (Traversable, traverse, sequence)
 import Data.NonEmpty (NonEmpty(), (:|))
-import Test.QuickCheck.Arbitrary
-import Test.QuickCheck.Gen
+
+import Test.QuickCheck.Arbitrary (class Coarbitrary, class Arbitrary, coarbitrary, arbitrary)
+import Test.QuickCheck.Gen (sized)
 
 -- | An abstract tree type
 data Tree a = Tree a (Array (Tree a))
