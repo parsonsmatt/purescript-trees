@@ -1,5 +1,5 @@
 module Data.Tree
-  ( Tree()
+  ( Tree(..)
   , View(..)
   , out
   , into
@@ -18,7 +18,7 @@ import Data.Foldable (Foldable, foldr, foldl, foldMap)
 import Data.Traversable (Traversable, traverse, sequence)
 import Data.NonEmpty (NonEmpty(), (:|))
 
-import Test.QuickCheck.Arbitrary (class Coarbitrary, class Arbitrary, coarbitrary, arbitrary)
+import Test.QuickCheck.Arbitrary (Coarbitrary, Arbitrary, coarbitrary, arbitrary)
 import Test.QuickCheck.Gen (sized)
 
 -- | An abstract tree type
