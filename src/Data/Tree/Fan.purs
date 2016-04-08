@@ -9,11 +9,18 @@ module Data.Tree.Fan
   ) where
 
 import Prelude
-import Data.Array ((:), concatMap)
+import Math as Math
+import Data.Int as Int
+import Data.Array ((:), concatMap, replicateM)
+import Control.Extend (Extend, extend)
+import Control.Comonad (Comonad, extract)
 import Data.Foldable (Foldable, foldr, foldl, foldMap)
 import Data.Functor.Compose
 import Data.Lazy
 import Data.Traversable (Traversable, traverse, sequence)
+
+import Test.QuickCheck.Arbitrary (Coarbitrary, Arbitrary, coarbitrary, arbitrary)
+import Test.QuickCheck.Gen (sized)
 
 -- | A fan is a finitarily-branching spread (i.e. a non-wellfounded tree where
 -- | each node has only finitely many immediate children).
@@ -59,9 +66,27 @@ instance bindFan :: Bind Fan where
 
 instance monadFan :: Monad Fan
 
+instance extendFan :: Extend Fan where
+  extend f t@(Fan a ts) = Fan (f t) ((map <<< map <<< map) (extend f) ts)
+
+instance comonadFan :: Comonad Fan where
+  extract (Fan a _) = a
+
 instance foldableFan :: Foldable Fan where
   foldr f b (Fan a ts) = f a (force (foldr g b <$> ts))
     where g t b = force (map (foldr f b) t)
   foldl f b (Fan a ts) = f (force (foldl g b <$> ts)) a
     where g b t = force (map (foldl f b) t)
   foldMap f (Fan a ts) = f a <> (force (foldMap (map (foldMap f) >>> force) <$> ts))
+
+instance arbitraryFan :: Arbitrary a => Arbitrary (Fan a) where
+  arbitrary = sized go
+    where go 0 = Fan <$> arbitrary <*> pure (pure [])
+          go n = do
+            sz <- Int.floor <<< Math.abs <$> arbitrary
+            a <- arbitrary
+            rest <- replicateM sz (go (n / (sz + 1)))
+            return (Fan a (defer \_ -> (map pure rest)))
+
+instance coarbitraryFan :: Coarbitrary a => Coarbitrary (Fan a) where
+  coarbitrary (Fan a ts) = coarbitrary a <<< coarbitrary ts
