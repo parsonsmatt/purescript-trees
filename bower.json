@@ -31,6 +31,10 @@
     "purescript-quickcheck-laws": "^0.1.1",
     "purescript-lists": "^0.7.4",
     "purescript-functor-compose": "^0.0.0",
-    "purescript-lazy": "^0.4.0"
+    "purescript-lazy": "^0.4.0",
+    "purescript-free": "^0.9.1"
+  },
+  "devDependencies": {
+    "purescript-test-unit": "^4.1.0"
   }
 }
