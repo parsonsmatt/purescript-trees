@@ -12,12 +12,12 @@ import Prelude
 import Data.Tuple (Tuple(..))
 import Math as Math
 import Data.Int as Int
-import Data.Array ((:), concatMap, replicateM)
+import Data.Array (replicateM)
 import Control.Extend (Extend, extend)
 import Control.Comonad (Comonad, extract)
 import Data.Foldable (Foldable, foldr, foldl, foldMap)
-import Data.Functor.Compose
-import Data.Lazy
+import Data.Functor.Compose (Compose(Compose), decompose)
+import Data.Lazy (Lazy, defer, force)
 import Data.Traversable (Traversable, traverse, sequence)
 
 import Test.QuickCheck.Arbitrary (Coarbitrary, Arbitrary, coarbitrary, arbitrary)
