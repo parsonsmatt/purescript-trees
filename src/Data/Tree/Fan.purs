@@ -9,6 +9,7 @@ module Data.Tree.Fan
   ) where
 
 import Prelude
+import Data.Tuple (Tuple(..))
 import Math as Math
 import Data.Int as Int
 import Data.Array ((:), concatMap, replicateM)
@@ -44,6 +45,11 @@ outLazy (Fan a ts) = View a (Compose <$> force ts)
 
 transView :: forall f g a. (forall b. f b -> g b) -> View f a -> View g a
 transView η (View a ts) = View a (η <$> ts)
+
+unfold :: forall a b. (a -> Tuple b (Array a)) -> a -> Fan b
+unfold f x =
+  case f x of
+       Tuple b xs -> Fan b (defer \_ -> map (\a -> defer \_ -> unfold f a) xs)
 
 instance showFan :: (Show a) => Show (Fan a) where
   show (Fan a ts) = "Fan " <> show a <> show (force <$> force ts)
