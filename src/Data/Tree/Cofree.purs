@@ -16,9 +16,8 @@ import Optic.Index (class Index, ix)
 
 -- | The type of a generalized tree data structure.
 -- | The type parameters are:
--- | - `f` : a type constructor indexed by `k` that stores the subtrees.
+-- | - `f` : a type constructor that stores the subtrees.
 -- | - `g` : a type constructor that specifies further effects of the data
--- | - `k` : a type used to index into the subtrees
 -- | - `a` : a value stored at each node of the tree.
 newtype Tree f g a = Tree (Cofree (Compose f g) a)
 
