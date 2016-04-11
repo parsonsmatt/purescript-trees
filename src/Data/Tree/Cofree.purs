@@ -2,6 +2,7 @@ module Data.Tree.Cofree where
 
 import Prelude
 
+import Control.MonadPlus
 import Control.Extend (class Extend, extend)
 import Control.Comonad (class Comonad, extract)
 import Control.Plus (class Plus, empty)
@@ -34,6 +35,16 @@ instance extendTree :: (Functor f, Functor g) => Extend (Tree f g) where
 
 instance comonadTree :: (Functor f, Functor g) => Comonad (Tree f g) where
   extract = extract .. unTree
+
+instance applyTree :: (Apply f, Apply g) => Apply (Tree f g) where
+  apply (Tree ff) (Tree fa) = Tree (apply ff fa)
+
+instance applicativeTree :: (Apply f, Plus f, Applicative g) => Applicative (Tree f g) where
+  pure = singleton
+
+-- there are no legal instances of `MonadPlus`, so this instance is meaningless
+instance bindTree :: (Apply f, Apply g, MonadPlus (Compose f g)) => Bind (Tree f g) where
+  bind (Tree a) f = Tree (bind a (unTree .. f))
 
 -- | The type of strict trees.
 type TreeS f a = Tree f Identity a
