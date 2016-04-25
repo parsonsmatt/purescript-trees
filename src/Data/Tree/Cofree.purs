@@ -2,16 +2,18 @@ module Data.Tree.Cofree where
 
 import Prelude
 
-import Control.MonadPlus
-import Control.Extend (class Extend, extend)
 import Control.Comonad (class Comonad, extract)
+import Control.Comonad.Cofree (Cofree, mkCofree, head, tail)
+import Control.Extend (class Extend, extend)
+import Control.MonadPlus (class MonadPlus)
 import Control.Plus (class Plus, empty)
-import Data.Maybe (Maybe)
+
 import Data.Lazy (Lazy, defer)
 import Data.List.Lazy (List)
-import Data.Identity (Identity(Identity), runIdentity)
-import Data.Functor.Compose (Compose(Compose), decompose)
-import Control.Comonad.Cofree (Cofree, mkCofree, tail)
+import Data.Maybe (Maybe(..))
+import Data.Identity (Identity(), runIdentity)
+import Data.Foldable (class Foldable, maximum)
+import Data.Functor.Compose (Compose(..), decompose)
 
 import Optic.Core ((..))
 import Optic.Extended ((^?))
@@ -31,7 +33,7 @@ instance functorTree :: (Functor f, Functor g) => Functor (Tree f g) where
   map f = Tree .. map f .. unTree
 
 instance extendTree :: (Functor f, Functor g) => Extend (Tree f g) where
-  extend f = Tree .. extend (f <<< Tree) .. unTree
+  extend f = Tree .. extend (f .. Tree) .. unTree
 
 instance comonadTree :: (Functor f, Functor g) => Comonad (Tree f g) where
   extract = extract .. unTree
@@ -100,17 +102,55 @@ index'
   -> Maybe (TreeS f a)
 index' i = map runIdentity .. index i
 
+depth :: forall f g a. (Functor f, Foldable f, Comonad g, Functor g, Eq a)
+      => Tree f g a -> Int
+depth = depth' .. unG .. unTree where
+    unG a = mkCofree (head a) (map extract (decompose .. map unG .. tail $ a))
+    depth' a = case maximum (map depth' (tail a)) of
+        Nothing -> 1
+        Just n  -> n + 1
+
+repeat :: forall f a. (Applicative f) => a -> TreeL f a
+repeat = Tree .. repeat'
+  where repeat' x = mkCofree x (Compose (pure (defer \_ -> repeat' x)))
+
+replicate :: forall f g a. (Applicative f, Plus f, Applicative g)
+          => Int -> a -> Tree f g a
+replicate n = Tree .. replicate' n
+    where replicate' 1 a = mkCofree a empty
+          replicate' n a = mkCofree a (pure (replicate' (n-1) a))
+
+take :: forall f g a. (Plus f, Functor g)
+     => Int
+     -> Tree f g a
+     -> Tree f g a
+take n = Tree .. take' n .. unTree
+  where take' 1 a = mkCofree (head a) empty
+        take' n a = mkCofree (head a) (take' (n-1) <$> tail a)
+
+tree :: forall f g a. (Functor f, Functor g)
+     => a -> f (g (Tree f g a)) -> Tree f g a
+tree x = Tree .. mkCofree x .. Compose .. map (map unTree)
+
+tree' :: forall f g a. (Functor f, Applicative g)
+      => a -> f (Tree f g a) -> Tree f g a
+tree' x = Tree .. mkCofree x .. Compose .. map (pure .. unTree)
+
 -- | Construct a rose tree.
 roseTree :: forall a. a -> Array (RoseTree a) -> RoseTree a
-roseTree x = Tree .. mkCofree x .. Compose .. map (Identity .. unTree)
+roseTree = tree'
 
 -- | Construct a spread.
 spread :: forall a. a -> List (Spread a) -> Spread a
-spread x = Tree .. mkCofree x .. Compose .. map (Identity .. unTree)
+spread = tree'
 
 -- | Construct a fan.
-fan :: forall a. a -> Array (Fan a) -> Fan a
-fan x = Tree .. mkCofree x .. Compose .. map ((\a -> defer \_ -> a) .. unTree)
+fan :: forall a. a -> Array (Lazy (Fan a)) -> Fan a
+fan = tree
+
+-- | Construct a fan.
+fan' :: forall a. a -> Array (Fan a) -> Fan a
+fan' = tree'
 
 -- | Construct an empty tree.
 singleton :: forall f g a. (Plus f, Functor g) => a -> Tree f g a
