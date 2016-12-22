@@ -24,10 +24,10 @@
     "package.json"
   ],
   "dependencies": {
-    "purescript-arrays": "^0.4.2",
-    "purescript-foldable-traversable": "^0.4.0",
-    "purescript-nonempty": "^0.1.0",
-    "purescript-quickcheck": "^0.12.2",
-    "purescript-quickcheck-laws": "^0.1.1"
+    "purescript-arrays": "^3.1.0",
+    "purescript-foldable-traversable": "^2.0.0",
+    "purescript-nonempty": "^3.0.0",
+    "purescript-quickcheck": "^3.1.1",
+    "purescript-quickcheck-laws": "^2.1.0"
   }
 }
