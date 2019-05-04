@@ -1,11 +1,10 @@
 module Test.Data.Tree (testTree) where
 
 import Prelude
-import Control.Monad.Eff (Eff)
-import Control.Monad.Eff.Console (CONSOLE, log)
-import Control.Monad.Eff.Exception (EXCEPTION)
-import Control.Monad.Eff.Random (RANDOM)
+
 import Data.Tree (Tree)
+import Effect (Effect)
+import Effect.Console (log)
 import Test.QuickCheck.Laws.Control.Applicative (checkApplicative)
 import Test.QuickCheck.Laws.Control.Apply (checkApply)
 import Test.QuickCheck.Laws.Control.Bind (checkBind)
@@ -22,7 +21,7 @@ proxy2 = Proxy2
 proxyN :: Proxy (Tree Number)
 proxyN = Proxy
 
-testTree :: forall eff. Eff( console :: CONSOLE, random :: RANDOM, err :: EXCEPTION | eff) Unit
+testTree :: Effect Unit
 testTree = do
   log "Testing Laws for Instances"
   checkFunctor proxy2

@@ -77,7 +77,7 @@ instance foldableTree :: Foldable Tree where
 
 instance traversableTree :: Traversable Tree where
   traverse f (Tree a ts) = Tree <$> f a <*> traverse (traverse f) ts
-  sequence = traverse id
+  sequence = traverse identity
 
 instance extendTree :: Extend Tree where
   extend f t@(Tree a ts) = Tree (f t) (map (extend f) ts)
