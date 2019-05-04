@@ -8,17 +8,16 @@ module Data.Tree
   ) where
 
 import Prelude
-
-import Math as Math
+import Control.Comonad (class Comonad)
 import Data.Int as Int
-import Control.Extend (Extend, extend)
-import Control.Comonad (Comonad, extract)
-import Data.Array ((:), concatMap, replicateM)
-import Data.Foldable (Foldable, foldr, foldl, foldMap)
-import Data.Traversable (Traversable, traverse, sequence)
-import Data.NonEmpty (NonEmpty(), (:|))
-
-import Test.QuickCheck.Arbitrary (Coarbitrary, Arbitrary, coarbitrary, arbitrary)
+import Math as Math
+import Control.Bind (bindFlipped)
+import Control.Extend (class Extend, extend)
+import Data.Array (concatMap, replicate, (:))
+import Data.Foldable (class Foldable, foldr, foldl, foldMap)
+import Data.NonEmpty (NonEmpty, (:|))
+import Data.Traversable (class Traversable, traverse, sequence)
+import Test.QuickCheck.Arbitrary (class Coarbitrary, class Arbitrary, coarbitrary, arbitrary)
 import Test.QuickCheck.Gen (sized)
 
 -- | An abstract tree type
@@ -60,14 +59,14 @@ instance functorTree :: Functor Tree where
   map f (Tree a ts) = Tree (f a) (map f <$> ts)
 
 instance applyTree :: Apply Tree where
-  apply (Tree f tf) t@(Tree a ta) = Tree (f a) (map (f <$>) ta <> map (<*> t) tf)
+  apply (Tree f tf) t@(Tree a ta) = Tree (f a) (map (map f) ta <> map (_ <*> t) tf)
 
 instance applicativeTree :: Applicative Tree where
   pure a = Tree a []
 
 instance bindTree :: Bind Tree where
   bind (Tree a ts) f = case f a of
-    Tree a' ts' -> Tree a' (ts' <> map (`bind` f) ts)
+    Tree a' ts' -> Tree a' (ts' <> map (bindFlipped f) ts)
 
 instance monadTree :: Monad Tree
 
@@ -78,7 +77,7 @@ instance foldableTree :: Foldable Tree where
 
 instance traversableTree :: Traversable Tree where
   traverse f (Tree a ts) = Tree <$> f a <*> traverse (traverse f) ts
-  sequence = traverse id
+  sequence = traverse identity
 
 instance extendTree :: Extend Tree where
   extend f t@(Tree a ts) = Tree (f t) (map (extend f) ts)
@@ -88,15 +87,15 @@ instance comonadTree :: Comonad Tree where
 
 instance arbitraryTree :: Arbitrary a => Arbitrary (Tree a) where
   arbitrary = sized go
-    where go 0 = Tree <$> arbitrary <*> return []
+    where go 0 = Tree <$> arbitrary <*> pure []
           go n = do
             sz <- Int.floor <<< Math.abs <$> arbitrary
-            Tree <$> arbitrary <*> replicateM sz (go (n / (sz + 1)))
+            Tree <$> arbitrary <*> (sequence (replicate sz (go (n / (sz + 1)))))
 
 instance coarbitraryTree :: Coarbitrary a => Coarbitrary (Tree a) where
   coarbitrary (Tree a ts) = coarbitrary a <<< coarbitrary ts
 
 flatten :: forall a. Tree a -> NonEmpty Array a
 flatten (Tree a ts) = a :| concatMap flatten' ts
-  where flatten' (Tree a []) = [a]
-        flatten' (Tree a ts) = a : concatMap flatten' ts
+  where flatten' (Tree a' []) = [a']
+        flatten' (Tree a' ts') = a' : concatMap flatten' ts'
